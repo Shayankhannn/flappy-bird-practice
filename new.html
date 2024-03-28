@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flappy Bird</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #70c5ce;
+    }
+    #game-area {
+        position: relative;
+        width: 400px;
+        height: 500px;
+        background-color: #f7f7f7;
+        border: 2px solid #333;
+        overflow: hidden;
+    }
+    .bird {
+        position: absolute;
+        width: 30px; /* Smaller bird */
+        height: 30px; /* Smaller bird */
+        background-color: #ff595e;
+        border-radius: 50%;
+        top: 50%;
+        left: 50px;
+        transform: translateY(-50%);
+        transition: top 0.4s;
+    }
+    .pipe {
+        position: absolute;
+        width: 50px;
+        background-color: #4ecdc4;
+    }
+</style>
+</head>
+<body>
+<div id="game-area">
+    <div class="bird"></div>
+</div>
+<script>
+    const bird = document.querySelector('.bird');
+    const gameArea = document.getElementById('game-area');
+
+    let birdTop = 220;
+    let gravity = 2;
+    let isGameOver = false;
+
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') jump();
+    });
+
+    function jump() {
+        if (!isGameOver) {
+            birdTop -= 50;
+            bird.style.top = birdTop + 'px';
+        }
+    }
+
+    function createPipe() {
+        const pipeGap = 150;
+        const pipe = document.createElement('div');
+        pipe.classList.add('pipe');
+        const pipeHeight = Math.random() * 250;
+        pipe.style.height = pipeHeight + 'px';
+        pipe.style.left = '400px';
+        gameArea.appendChild(pipe);
+
+        const bottomPipe = document.createElement('div');
+        bottomPipe.classList.add('pipe');
+        bottomPipe.style.height = (gameArea.clientHeight - pipeHeight - pipeGap) + 'px';
+        bottomPipe.style.bottom = '0';
+        bottomPipe.style.left = '400px';
+        gameArea.appendChild(bottomPipe);
+
+        const movePipeInterval = setInterval(() => {
+            const pipes = document.querySelectorAll('.pipe');
+            pipes.forEach(p => {
+                const pipeLeft = parseInt(p.style.left);
+                if (pipeLeft <= -50) {
+                    p.remove();
+                } else {
+                    p.style.left = pipeLeft - 2 + 'px';
+
+                    if (pipeLeft === 100) {
+                        checkCollision(pipe, bottomPipe);
+                    }
+                }
+            });
+        }, 20);
+    }
+
+    function checkCollision(pipe, bottomPipe) {
+        const birdRect = bird.getBoundingClientRect();
+        const pipeRect = pipe.getBoundingClientRect();
+        const bottomPipeRect = bottomPipe.getBoundingClientRect();
+        if (
+            birdRect.right > pipeRect.left &&
+            birdRect.left < pipeRect.right &&
+            (birdRect.top < pipeRect.top || birdRect.bottom > bottomPipeRect.top)
+        ) {
+            gameOver();
+        }
+    }
+
+    function gameOver() {
+        isGameOver = true;
+        alert('Game Over!');
+    }
+
+    setInterval(createPipe, 3000);
+
+    setInterval(() => {
+        if (!isGameOver) {
+            birdTop += gravity;
+            bird.style.top = birdTop + 'px';
+        }
+    }, 50);
+</script>
+</body>
+</html>
