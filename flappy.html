@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flappy Bird</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #70c5ce;
+    }
+    #game-area {
+        position: relative;
+        width: 400px;
+        height: 500px;
+        background-color: #f7f7f7;
+        border: 2px solid #333;
+    }
+    .bird {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        background-color: #ff595e;
+        border-radius: 50%;
+        top: 50%;
+        left: 50px;
+        transform: translateY(-50%);
+    }
+    .pipe {
+        position: absolute;
+        width: 50px;
+        background-color: #4ecdc4;
+        bottom: 0;
+        animation: pipe 4s linear infinite;
+    }
+    @keyframes pipe {
+        0% {
+            left: 100%;
+        }
+        100% {
+            left: -50px;
+        }
+    }
+</style>
+</head>
+<body>
+<div id="game-area">
+    <div class="bird"></div>
+    <div class="pipe" id="pipe"></div>
+</div>
+<script>
+    const bird = document.querySelector('.bird');
+    const gameArea = document.getElementById('game-area');
+    const pipe = document.getElementById('pipe');
+
+    let birdTop = 220;
+    let gravity = 2;
+    let isGameOver = false;
+
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') jump();
+    });
+
+    function jump() {
+        if (birdTop > 20) birdTop -= 50;
+    }
+
+    function gameLoop() {
+        if (birdTop < 420) birdTop += gravity;
+        bird.style.top = birdTop + 'px';
+
+        if (isCollision()) {
+            gameOver();
+        }
+
+        if (!isGameOver) requestAnimationFrame(gameLoop);
+    }
+
+    function isCollision() {
+        let birdRect = bird.getBoundingClientRect();
+        let pipeRect = pipe.getBoundingClientRect();
+        return (
+            birdRect.bottom > gameArea.clientHeight ||
+            birdRect.top < 0 ||
+            (birdRect.right > pipeRect.left &&
+            birdRect.left < pipeRect.right &&
+            birdRect.bottom > pipeRect.top)
+        );
+    }
+
+    function gameOver() {
+        isGameOver = true;
+        alert('Game Over!');
+    }
+
+    gameLoop();
+</script>
+</body>
+</html>
