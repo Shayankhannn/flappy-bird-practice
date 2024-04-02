@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flappy Bird</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #70c5ce;
+    }
+    #game-area {
+        position: relative;
+        width: 400px;
+        height: 500px;
+        background-color: #f7f7f7;
+        border: 2px solid #333;
+        overflow: hidden;
+    }
+    .bird {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        background-color: #ff595e;
+        border-radius: 50%;
+        top: 50%;
+        left: 50px;
+        transform: translateY(-50%);
+    }
+    .pipe {
+        position: absolute;
+        width: 50px;
+        height: 200px;
+        background-color: #4ecdc4;
+        bottom: 0;
+        animation: pipe 4s linear infinite;
+    }
+    @keyframes pipe {
+        0% {
+            left: 100%;
+            height: 200px;
+        }
+        100% {
+            left: -50px;
+            height: 400px;
+        }
+    }
+</style>
+</head>
+<body>
+<div id="game-area">
+    <div class="bird"></div>
+    <div class="pipe" id="pipe1"></div>
+    <div class="pipe" id="pipe2" style="animation-delay: 2s;"></div>
+</div>
+<script>
+    const bird = document.querySelector('.bird');
+    const gameArea = document.getElementById('game-area');
+    const pipes = document.querySelectorAll('.pipe');
+    const jumpSound = new Audio('jump.mp3');
+
+    let birdTop = 220;
+    let gravity = 2;
+    let isGameOver = false;
+
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' && !isGameOver) jump();
+    });
+
+    function jump() {
+        birdTop -= 50;
+        if (birdTop < 0) birdTop = 0; // Ensure bird doesn't fly off the screen
+        jumpSound.play();
+    }
+
+    function gameLoop() {
+        if (birdTop < 420) birdTop += gravity;
+        bird.style.top = birdTop + 'px';
+
+        if (isCollision()) {
+            gameOver();
+        }
+
+        if (!isGameOver) requestAnimationFrame(gameLoop);
+    }
+
+    function isCollision() {
+        let birdRect = bird.getBoundingClientRect();
+        let pipeRect1 = pipes[0].getBoundingClientRect();
+        let pipeRect2 = pipes[1].getBoundingClientRect();
+
+        if ((birdRect.left < pipeRect1.right && birdRect.right > pipeRect1.left &&
+            birdRect.top < pipeRect1.bottom && birdRect.bottom > pipeRect1.top) ||
+            (birdRect.left < pipeRect2.right && birdRect.right > pipeRect2.left &&
+            birdRect.top < pipeRect2.bottom && birdRect.bottom > pipeRect2.top) ||
+            birdRect.bottom > gameArea.clientHeight) {
+            return true;
+        }
+        return false;
+    }
+
+    function gameOver() {
+        isGameOver = true;
+        alert('Game Over!');
+    }
+
+    gameLoop();
+</script>
+</body>
+</html>
