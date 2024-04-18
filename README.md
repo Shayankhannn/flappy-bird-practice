@@ -5,3 +5,6 @@ the files are veersions of the game during development
 with each versions the code will improve and the game will also improve
 
 just ignore rest of unnecessary files
+
+
+final3 is the final file
